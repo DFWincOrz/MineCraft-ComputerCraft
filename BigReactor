@@ -1,0 +1,39 @@
+local react = peripheral.wrap( "BigReactors-Reactor_0")
+local mont = peripheral.wrap( "top")
+screenSide = "top" --Side of the computer the screen is on
+screenX = 1
+function pts( out, color)
+	screenX = screenX + 1
+	mont.setTextColor(color)
+	peripheral.call( screenSide, "write", out)
+	peripheral.call( screenSide, "setCursorPos", 1, screenX)
+end
+function ptc()
+	screenX = 1
+	peripheral.call( screenSide, "clear")
+	peripheral.call( screenSide, "setCursorPos", 1, screenX)
+end
+peripheral.call( screenSide, "setTextScale", 2)	--output scale, 4 works for a 7x3 block screen.
+while not redstone.getInput( "front") do
+	ptc()
+	local eStored = react.getEnergyStored() / 1000
+	local tEnergy = react.getEnergyProducedLastTick()
+	local fAmount = react.getFuelAmount()
+	if eStored > 4000 then
+		react.setAllControlRodLevels(100)
+		pts( "KRF St:\n"..eStored, 16384)
+	else
+		react.setAllControlRodLevels(0)
+		pts( "KRF St:\n"..eStored, 32)
+	end
+	pts( "RF/t\n\n:\n"..tEnergy, 2)
+	if fAmount > 1000 then
+		pts( "MB St\n:\n"..fAmount, 16)
+	else
+		pts( "MB St\n:\n"..fAmount, 16384)
+	end
+	pts("MB/t\n\n:\n"..react.getFuelConsumedLastTick(), 16)
+	pts("WMB St:\n"..react.getWasteAmount(), 2048)
+	
+	os.sleep(1)
+end
